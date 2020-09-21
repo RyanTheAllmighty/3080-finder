@@ -15,6 +15,7 @@ import CPLOnline from './sites/cplonline';
 import GameDude from './sites/gamedude';
 import AussieAppliances from './sites/aussieappliances';
 import ShoppingExpress from './sites/shoppingexpress';
+import BudgetPC from './sites/budgetpc';
 
 class Application {
     scanners: Scannable[] = [
@@ -27,6 +28,7 @@ class Application {
         new GameDude(),
         new AussieAppliances(),
         new ShoppingExpress(),
+        new BudgetPC(),
     ];
 
     async scanSites() {
