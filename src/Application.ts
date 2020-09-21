@@ -14,6 +14,7 @@ import MWave from './sites/mwave';
 import CPLOnline from './sites/cplonline';
 import GameDude from './sites/gamedude';
 import AussieAppliances from './sites/aussieappliances';
+import ShoppingExpress from './sites/shoppingexpress';
 
 class Application {
     scanners: Scannable[] = [
@@ -25,6 +26,7 @@ class Application {
         new CPLOnline(),
         new GameDude(),
         new AussieAppliances(),
+        new ShoppingExpress(),
     ];
 
     async scanSites() {
