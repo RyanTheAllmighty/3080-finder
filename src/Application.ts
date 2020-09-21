@@ -23,6 +23,7 @@ import PCByte from './sites/pcbyte';
 import AustinComputers from './sites/austincomputers';
 import UMart from './sites/umart';
 import ComputerAlliance from './sites/computeralliance';
+import OnlineComputer from './sites/onlinecomputer';
 
 class Application {
     scanners: Scannable[] = [
@@ -40,6 +41,7 @@ class Application {
         new AustinComputers(),
         new UMart(),
         new ComputerAlliance(),
+        new OnlineComputer(),
     ];
 
     pusher = new PushBullet(config.get<string>('pushbullet_key'));

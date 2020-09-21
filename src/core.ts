@@ -19,7 +19,5 @@ export interface ScanResult {
 }
 
 export interface Scannable {
-    url: string;
-
     scan: (browser: Browser) => Promise<ScanResult>;
 }
