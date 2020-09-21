@@ -11,9 +11,17 @@ import PLEComputers from './sites/plecomputers';
 import PCCaseGear from './sites/pccasegear';
 import Scorptec from './sites/scorptec';
 import MWave from './sites/mwave';
+import CPLOnline from './sites/cplonline';
 
 class Application {
-    scanners: Scannable[] = [new PBTech(), new PLEComputers(), new PCCaseGear(), new Scorptec(), new MWave()];
+    scanners: Scannable[] = [
+        new PBTech(),
+        new PLEComputers(),
+        new PCCaseGear(),
+        new Scorptec(),
+        new MWave(),
+        new CPLOnline(),
+    ];
 
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');
