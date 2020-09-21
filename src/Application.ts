@@ -13,6 +13,7 @@ import Scorptec from './sites/scorptec';
 import MWave from './sites/mwave';
 import CPLOnline from './sites/cplonline';
 import GameDude from './sites/gamedude';
+import AussieAppliances from './sites/aussieappliances';
 
 class Application {
     scanners: Scannable[] = [
@@ -23,6 +24,7 @@ class Application {
         new MWave(),
         new CPLOnline(),
         new GameDude(),
+        new AussieAppliances(),
     ];
 
     async scanSites() {
@@ -33,6 +35,7 @@ class Application {
             headless: false,
             defaultViewport: null,
             args: ['--window-size=1920,1080', '--window-position=1921,0'],
+            timeout: 60000,
         });
 
         await Promise.allSettled(
