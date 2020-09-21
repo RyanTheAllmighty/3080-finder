@@ -1,4 +1,7 @@
+import config from 'config';
 import puppeteer from 'puppeteer';
+// @ts-ignore
+import PushBullet from 'pushbullet';
 import { performance } from 'perf_hooks';
 
 import { Card, CardDBRecord, Scannable, ScanResult } from './core';
@@ -39,6 +42,8 @@ class Application {
         new ComputerAlliance(),
     ];
 
+    pusher = new PushBullet(config.get<string>('pushbullet_key'));
+
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');
         const start = performance.now();
@@ -71,29 +76,59 @@ class Application {
                             });
 
                             if (!cardRecord) {
+                                this.pusher.note(
+                                    config.get<string>('pushbullet_device_id'),
+                                    '3080 Finder',
+                                    `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}"`,
+                                );
+
                                 logger.info(
                                     `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}"`,
                                 );
                             } else {
                                 if (cardRecord.price !== card.price) {
+                                    this.pusher.note(
+                                        config.get<string>('pushbullet_device_id'),
+                                        '3080 Finder',
+                                        `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price}`,
+                                    );
+
                                     logger.info(
                                         `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price}`,
                                     );
                                 }
 
                                 if (cardRecord.availability !== card.availability) {
+                                    this.pusher.note(
+                                        config.get<string>('pushbullet_device_id'),
+                                        '3080 Finder',
+                                        `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}"`,
+                                    );
+
                                     logger.info(
                                         `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}"`,
                                     );
                                 }
 
                                 if (cardRecord.stockStore !== card.stockStore) {
+                                    this.pusher.note(
+                                        config.get<string>('pushbullet_device_id'),
+                                        '3080 Finder',
+                                        `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}"`,
+                                    );
+
                                     logger.info(
                                         `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}"`,
                                     );
                                 }
 
                                 if (cardRecord.stockSupplier !== card.stockSupplier) {
+                                    this.pusher.note(
+                                        config.get<string>('pushbullet_device_id'),
+                                        '3080 Finder',
+                                        `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}"`,
+                                    );
+
                                     logger.info(
                                         `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}"`,
                                     );
