@@ -1,3 +1,5 @@
+import type { Browser } from 'puppeteer';
+
 export interface Card {
     name: String;
     productNumber: String;
@@ -19,5 +21,5 @@ export interface ScanResult {
 export interface Scannable {
     url: string;
 
-    scan: () => Promise<ScanResult>;
+    scan: (browser: Browser) => Promise<ScanResult>;
 }

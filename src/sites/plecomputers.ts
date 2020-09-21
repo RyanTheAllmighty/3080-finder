@@ -1,16 +1,12 @@
-import puppeteer from 'puppeteer';
 import currency from 'currency.js';
+import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
 
 class PLEComputers implements Scannable {
     url = 'https://www.ple.com.au/Categories/1152/Graphics-Cards/Nvidia-GeForce/RTX30-Series3080';
 
-    async scan() {
-        const browser = await puppeteer.launch({
-            headless: false,
-            args: ['--window-size=1920,1080', '--window-position=1921,0'],
-        });
+    async scan(browser: Browser) {
         const page = await browser.newPage();
         await page.goto(this.url);
 
@@ -45,7 +41,7 @@ class PLEComputers implements Scannable {
             });
         }
 
-        await browser.close();
+        await page.close();
 
         return {
             cards,

@@ -1,4 +1,4 @@
-import schedule from 'node-schedule';
+import puppeteer from 'puppeteer';
 import { performance } from 'perf_hooks';
 
 import { Card, CardDBRecord, Scannable, ScanResult } from './core';
@@ -14,62 +14,83 @@ class Application {
 
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');
+        const start = performance.now();
 
-        for (const scanner of this.scanners) {
-            logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
-            const start = performance.now();
+        const browser = await puppeteer.launch({
+            headless: false,
+            defaultViewport: null,
+            args: ['--window-size=1920,1080', '--window-position=1921,0'],
+        });
 
-            const result = await scanner.scan();
+        await Promise.allSettled(
+            this.scanners.map(
+                (scanner) =>
+                    new Promise(async (resolve) => {
+                        logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
+                        const start = performance.now();
 
-            const end = performance.now();
-            logger.debug(`Scheduler::scanSites - finished running ${scanner.constructor.name} in ${end - start}ms`);
+                        const result = await scanner.scan(browser);
 
-            for await (const card of result.cards) {
-                const cardRecord = await databases.cards.findOne<CardDBRecord>({
-                    productNumber: card.productNumber,
-                    scanner: scanner.constructor.name,
-                });
-
-                if (!cardRecord) {
-                    logger.info(
-                        `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}"`,
-                    );
-                } else {
-                    if (cardRecord.price !== card.price) {
-                        logger.info(
-                            `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price}`,
+                        const end = performance.now();
+                        logger.debug(
+                            `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${end - start}ms`,
                         );
-                    }
 
-                    if (cardRecord.availability !== card.availability) {
-                        logger.info(
-                            `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}"`,
-                        );
-                    }
+                        for await (const card of result.cards) {
+                            const cardRecord = await databases.cards.findOne<CardDBRecord>({
+                                productNumber: card.productNumber,
+                                scanner: scanner.constructor.name,
+                            });
 
-                    if (cardRecord.stockStore !== card.stockStore) {
-                        logger.info(
-                            `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}"`,
-                        );
-                    }
+                            if (!cardRecord) {
+                                logger.info(
+                                    `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}"`,
+                                );
+                            } else {
+                                if (cardRecord.price !== card.price) {
+                                    logger.info(
+                                        `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price}`,
+                                    );
+                                }
 
-                    if (cardRecord.stockSupplier !== card.stockSupplier) {
-                        logger.info(
-                            `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}"`,
-                        );
-                    }
-                }
+                                if (cardRecord.availability !== card.availability) {
+                                    logger.info(
+                                        `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}"`,
+                                    );
+                                }
 
-                await databases.cards.update<CardDBRecord>(
-                    {
-                        productNumber: card.productNumber,
-                        scanner: scanner.constructor.name,
-                    },
-                    { ...card, scanner: scanner.constructor.name },
-                    { upsert: true },
-                );
-            }
-        }
+                                if (cardRecord.stockStore !== card.stockStore) {
+                                    logger.info(
+                                        `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}"`,
+                                    );
+                                }
+
+                                if (cardRecord.stockSupplier !== card.stockSupplier) {
+                                    logger.info(
+                                        `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}"`,
+                                    );
+                                }
+                            }
+
+                            await databases.cards.update<CardDBRecord>(
+                                {
+                                    productNumber: card.productNumber,
+                                    scanner: scanner.constructor.name,
+                                },
+                                { ...card, scanner: scanner.constructor.name },
+                                { upsert: true },
+                            );
+                        }
+
+                        resolve();
+                    }),
+            ),
+        );
+
+        const end = performance.now();
+        logger.debug(`Scheduler::scanSites - finished running after ${end - start}ms`);
+
+        await browser.close();
     }
 
     /**

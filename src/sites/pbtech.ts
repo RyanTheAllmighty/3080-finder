@@ -1,16 +1,12 @@
-import puppeteer from 'puppeteer';
 import currency from 'currency.js';
+import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
 
 class PBTech implements Scannable {
     url = 'https://www.pbtech.com/au/category/components/video-cards/nvidia-desktop-graphics-cards/geforce-rtx-3080';
 
-    async scan() {
-        const browser = await puppeteer.launch({
-            headless: false,
-            args: ['--window-size=1920,1080', '--window-position=1921,0'],
-        });
+    async scan(browser: Browser) {
         const page = await browser.newPage();
         await page.goto(this.url);
 
@@ -54,7 +50,7 @@ class PBTech implements Scannable {
             });
         }
 
-        await browser.close();
+        await page.close();
 
         return {
             cards,
