@@ -2,6 +2,7 @@ import config from 'config';
 import puppeteer from 'puppeteer';
 // @ts-ignore
 import PushBullet from 'pushbullet';
+import schedule from 'node-schedule';
 import { performance } from 'perf_hooks';
 
 import { Card, CardDBRecord, Scannable, ScanResult } from './core';
@@ -46,12 +47,12 @@ class Application {
 
     pusher = new PushBullet(config.get<string>('pushbullet_key'));
 
-    async scanSites() {
+    async scanSites(headless: boolean) {
         logger.debug('Scheduler::scanSites - running');
         const start = performance.now();
 
         const browser = await puppeteer.launch({
-            headless: false,
+            headless,
             defaultViewport: null,
             args: ['--window-size=1920,1080', '--window-position=1921,0'],
             timeout: 60000,
@@ -156,6 +157,10 @@ class Application {
         logger.debug(`Scheduler::scanSites - finished running after ${end - start}ms`);
 
         await browser.close();
+
+        // compact the database
+        // @ts-ignore
+        databases.cards.persistence.compactDatafile();
     }
 
     /**
@@ -164,12 +169,9 @@ class Application {
     async start() {
         logger.debug('Starting application');
 
-        // schedule.scheduleJob('* * * * *', () => this.scanSites());
-        await this.scanSites();
+        schedule.scheduleJob('*/5 * * * *', () => this.scanSites(true));
 
-        // compact the database
-        // @ts-ignore
-        databases.cards.persistence.compactDatafile();
+        // await this.scanSites(false);
     }
 }
 
