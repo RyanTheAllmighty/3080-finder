@@ -12,6 +12,7 @@ import PCCaseGear from './sites/pccasegear';
 import Scorptec from './sites/scorptec';
 import MWave from './sites/mwave';
 import CPLOnline from './sites/cplonline';
+import GameDude from './sites/gamedude';
 
 class Application {
     scanners: Scannable[] = [
@@ -21,6 +22,7 @@ class Application {
         new Scorptec(),
         new MWave(),
         new CPLOnline(),
+        new GameDude(),
     ];
 
     async scanSites() {
