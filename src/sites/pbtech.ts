@@ -1,13 +1,9 @@
 import puppeteer from 'puppeteer';
 import currency from 'currency.js';
-import parse from 'date-fns/parse';
 
-import logger from '../../utils/logger';
-import { databases } from '../../utils/db';
+import type { Card, Scannable } from '../core';
 
-import type { Card, Scannable, ScanResult } from '../../core';
-
-class PBTechScanner implements Scannable {
+class PBTech implements Scannable {
     url = 'https://www.pbtech.com/au/category/components/video-cards/nvidia-desktop-graphics-cards/geforce-rtx-3080';
 
     async scan() {
@@ -66,4 +62,4 @@ class PBTechScanner implements Scannable {
     }
 }
 
-export default PBTechScanner;
+export default PBTech;

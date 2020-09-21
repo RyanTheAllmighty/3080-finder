@@ -5,10 +5,12 @@ import { Card, CardDBRecord, Scannable, ScanResult } from './core';
 
 import logger from './utils/logger';
 import { databases } from './utils/db';
-import PBTechScanner from './sites/pbtech/scanner';
+
+import PBTech from './sites/pbtech';
+import PLEComputers from './sites/plecomputers';
 
 class Application {
-    scanners: Scannable[] = [new PBTechScanner()];
+    scanners: Scannable[] = [new PBTech(), new PLEComputers()];
 
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');
