@@ -8,9 +8,10 @@ import { databases } from './utils/db';
 
 import PBTech from './sites/pbtech';
 import PLEComputers from './sites/plecomputers';
+import PCCaseGear from './sites/pccasegear';
 
 class Application {
-    scanners: Scannable[] = [new PBTech(), new PLEComputers()];
+    scanners: Scannable[] = [new PBTech(), new PLEComputers(), new PCCaseGear()];
 
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');
