@@ -16,6 +16,7 @@ import GameDude from './sites/gamedude';
 import AussieAppliances from './sites/aussieappliances';
 import ShoppingExpress from './sites/shoppingexpress';
 import BudgetPC from './sites/budgetpc';
+import PCByte from './sites/pcbyte';
 
 class Application {
     scanners: Scannable[] = [
@@ -29,6 +30,7 @@ class Application {
         new AussieAppliances(),
         new ShoppingExpress(),
         new BudgetPC(),
+        new PCByte(),
     ];
 
     async scanSites() {
