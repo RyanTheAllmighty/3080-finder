@@ -10,9 +10,10 @@ import PBTech from './sites/pbtech';
 import PLEComputers from './sites/plecomputers';
 import PCCaseGear from './sites/pccasegear';
 import Scorptec from './sites/scorptec';
+import MWave from './sites/mwave';
 
 class Application {
-    scanners: Scannable[] = [new PBTech(), new PLEComputers(), new PCCaseGear(), new Scorptec()];
+    scanners: Scannable[] = [new PBTech(), new PLEComputers(), new PCCaseGear(), new Scorptec(), new MWave()];
 
     async scanSites() {
         logger.debug('Scheduler::scanSites - running');

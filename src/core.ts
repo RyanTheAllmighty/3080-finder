@@ -4,7 +4,7 @@ export interface Card {
     name: String;
     productNumber: String;
     price: Number;
-    availability?: Date;
+    availability: String;
     url: String;
     stockStore?: Number;
     stockSupplier?: Number;
