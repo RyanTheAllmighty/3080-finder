@@ -58,7 +58,7 @@ class Application {
         const browser = await puppeteer.launch({
             headless,
             defaultViewport: null,
-            args: ['--window-size=1920,1080', '--window-position=1921,0'],
+            args: ['--window-size=1920,1080', '--window-position=1921,0', '--no-sandbox', '--disable-setuid-sandbox'],
             timeout: 60000,
         });
 
