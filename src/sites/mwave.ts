@@ -12,7 +12,7 @@ class MWave implements Scannable {
 
         const cards: Card[] = [];
 
-        await page.waitForSelector('.productList');
+        await page.waitForSelector('.productList', { timeout: 60000 });
         const items = await page.$$('.productList .listItem');
 
         for await (const item of items) {
