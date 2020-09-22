@@ -12,7 +12,7 @@ class PBTech implements Scannable {
 
         const cards: Card[] = [];
 
-        await page.waitForSelector('.products_list_wrapper');
+        await page.waitForSelector('#products');
         const items = await page.$$('.products_list_wrapper .item');
 
         for await (const item of items) {
