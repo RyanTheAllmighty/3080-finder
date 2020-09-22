@@ -25,6 +25,7 @@ import AustinComputers from './sites/austincomputers';
 import UMart from './sites/umart';
 import ComputerAlliance from './sites/computeralliance';
 import OnlineComputer from './sites/onlinecomputer';
+import SaveOnIt from './sites/saveonit';
 
 class Application {
     scanners: Scannable[] = [
@@ -43,6 +44,7 @@ class Application {
         new UMart(),
         new ComputerAlliance(),
         new OnlineComputer(),
+        new SaveOnIt(),
     ];
 
     pusher = new PushBullet(config.get<string>('pushbullet_key'));
