@@ -61,91 +61,100 @@ class Application {
         await Promise.allSettled(
             this.scanners.map(
                 (scanner) =>
-                    new Promise(async (resolve) => {
-                        logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
-                        const start = performance.now();
+                    new Promise(async (resolve, reject) => {
+                        try {
+                            logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
+                            const start = performance.now();
 
-                        const result = await scanner.scan(browser);
+                            const result = await scanner.scan(browser);
 
-                        const end = performance.now();
-                        logger.debug(
-                            `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${end - start}ms`,
-                        );
+                            const end = performance.now();
+                            logger.debug(
+                                `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${
+                                    end - start
+                                }ms`,
+                            );
 
-                        for await (const card of result.cards) {
-                            const cardRecord = await databases.cards.findOne<CardDBRecord>({
-                                productNumber: card.productNumber,
-                                scanner: scanner.constructor.name,
-                            });
-
-                            if (!cardRecord) {
-                                this.pusher.note(
-                                    config.get<string>('pushbullet_device_id'),
-                                    '3080 Finder',
-                                    `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
-                                );
-
-                                logger.info(
-                                    `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
-                                );
-                            } else {
-                                if (cardRecord.price !== card.price) {
-                                    this.pusher.note(
-                                        config.get<string>('pushbullet_device_id'),
-                                        '3080 Finder',
-                                        `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
-                                    );
-
-                                    logger.info(
-                                        `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
-                                    );
-                                }
-
-                                if (cardRecord.availability !== card.availability) {
-                                    this.pusher.note(
-                                        config.get<string>('pushbullet_device_id'),
-                                        '3080 Finder',
-                                        `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
-                                    );
-
-                                    logger.info(
-                                        `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
-                                    );
-                                }
-
-                                if (cardRecord.stockStore !== card.stockStore) {
-                                    this.pusher.note(
-                                        config.get<string>('pushbullet_device_id'),
-                                        '3080 Finder',
-                                        `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
-                                    );
-
-                                    logger.info(
-                                        `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
-                                    );
-                                }
-
-                                if (cardRecord.stockSupplier !== card.stockSupplier) {
-                                    this.pusher.note(
-                                        config.get<string>('pushbullet_device_id'),
-                                        '3080 Finder',
-                                        `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
-                                    );
-
-                                    logger.info(
-                                        `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
-                                    );
-                                }
-                            }
-
-                            await databases.cards.update<CardDBRecord>(
-                                {
+                            for await (const card of result.cards) {
+                                const cardRecord = await databases.cards.findOne<CardDBRecord>({
                                     productNumber: card.productNumber,
                                     scanner: scanner.constructor.name,
-                                },
-                                { ...card, scanner: scanner.constructor.name },
-                                { upsert: true },
+                                });
+
+                                if (!cardRecord) {
+                                    this.pusher.note(
+                                        config.get<string>('pushbullet_device_id'),
+                                        '3080 Finder',
+                                        `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
+                                    );
+
+                                    logger.info(
+                                        `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
+                                    );
+                                } else {
+                                    if (cardRecord.price !== card.price) {
+                                        this.pusher.note(
+                                            config.get<string>('pushbullet_device_id'),
+                                            '3080 Finder',
+                                            `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
+                                        );
+
+                                        logger.info(
+                                            `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
+                                        );
+                                    }
+
+                                    if (cardRecord.availability !== card.availability) {
+                                        this.pusher.note(
+                                            config.get<string>('pushbullet_device_id'),
+                                            '3080 Finder',
+                                            `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
+                                        );
+
+                                        logger.info(
+                                            `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
+                                        );
+                                    }
+
+                                    if (cardRecord.stockStore !== card.stockStore) {
+                                        this.pusher.note(
+                                            config.get<string>('pushbullet_device_id'),
+                                            '3080 Finder',
+                                            `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
+                                        );
+
+                                        logger.info(
+                                            `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
+                                        );
+                                    }
+
+                                    if (cardRecord.stockSupplier !== card.stockSupplier) {
+                                        this.pusher.note(
+                                            config.get<string>('pushbullet_device_id'),
+                                            '3080 Finder',
+                                            `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
+                                        );
+
+                                        logger.info(
+                                            `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
+                                        );
+                                    }
+                                }
+
+                                await databases.cards.update<CardDBRecord>(
+                                    {
+                                        productNumber: card.productNumber,
+                                        scanner: scanner.constructor.name,
+                                    },
+                                    { ...card, scanner: scanner.constructor.name },
+                                    { upsert: true },
+                                );
+                            }
+                        } catch (e) {
+                            logger.error(
+                                `Error when scanning ${scanner.constructor.name} - ${e?.message || 'Unknown error'}`,
                             );
+                            reject(e);
                         }
 
                         resolve();
