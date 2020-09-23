@@ -7,11 +7,6 @@
     "type": "git",
     "url": "git+https://github.com/RyanTheAllmighty/3080-finder.git"
   },
-  "keywords": [
-    "discord",
-    "atlauncher",
-    "bot"
-  ],
   "author": "Ryan Dowling <ryan@ryandowling.me>",
   "license": "MIT",
   "bugs": {
