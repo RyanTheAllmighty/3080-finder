@@ -2,6 +2,26 @@
 
 Finds Nvidia RTX 3080 graphics cards at various retailers in Australia.
 
+## What is it?
+
+First thing to note is that this will **NOT** purchase cards for you. This is only intended to be used to check
+stock/availability/price/card changes at various retailers in Australia.
+
+I built this as I didn't want to have to preorder a card, and wanted some way to see when new cards come online with
+stock or ETA's are added to shopping sites.
+
+An alert will trigger when:
+
+- A new card is added to a retailer
+- A cards price is changed
+- A cards availability has changed
+- A cards stock level has changed (this is not common on most shops, but some do provide it)
+
+The first time you run the application it will blast you with notifications as it finds all the cards on all the shops.
+
+By default it will check for changes every 5 minutes, but it can be customised in the config using standard
+[cron syntax](https://crontab.guru/).
+
 ## Development
 
 To get setup you will need to make sure you have the following installed on your machine:
