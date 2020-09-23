@@ -1,10 +1,11 @@
 import config from 'config';
-import puppeteer from 'puppeteer';
 // @ts-ignore
 import PushBullet from 'pushbullet';
 import notifier from 'node-notifier';
 import schedule from 'node-schedule';
+import puppeteer from 'puppeteer-extra';
 import { performance } from 'perf_hooks';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 import { CardDBRecord, Scannable } from './core';
 
@@ -63,6 +64,8 @@ class Application {
     async scanSites(headless: boolean) {
         logger.debug('Scheduler::scanSites - running');
         const start = performance.now();
+
+        puppeteer.use(StealthPlugin());
 
         const browser = await puppeteer.launch({
             headless,
