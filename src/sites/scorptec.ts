@@ -31,7 +31,7 @@ class Scorptec implements Scannable {
 
             const availabilityElement = await item.$('.stock');
             const availability = await page.evaluate(
-                (el) => el.textContent.trim().replaceAll('\n', ''),
+                (el) => el.textContent.trim().replaceAll('\n', '').replace('Order OnlySOLD OUT', 'Order Only SOLD OUT'),
                 availabilityElement,
             );
 
