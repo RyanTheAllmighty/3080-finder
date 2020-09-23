@@ -2,6 +2,7 @@ import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import logger from '../utils/logger';
 
 class AussieAppliances implements Scannable {
     url =
@@ -36,8 +37,8 @@ class AussieAppliances implements Scannable {
 
                     try {
                         const productPage = await browser.newPage();
-                        await productPage.goto(url);
-                        await productPage.waitForSelector('.stock');
+                        await productPage.goto(url, { timeout: 60000 });
+                        await productPage.waitForSelector('.stock', { timeout: 60000 });
 
                         const availabilityElement = await productPage.$('.stock');
                         const availability = await productPage.evaluate(
@@ -55,6 +56,11 @@ class AussieAppliances implements Scannable {
                             url,
                         });
                     } catch (e) {
+                        logger.error(
+                            `Error when scanning ${productName} from ${this.constructor.name} - ${
+                                e?.message || 'Unknown error'
+                            }`,
+                        );
                         resolve();
                     }
 
