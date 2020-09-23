@@ -1,3 +1,4 @@
+import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
@@ -13,6 +14,8 @@ class AllNeeds implements Scannable {
             this.urls.map((pageUrl) => {
                 return new Promise(async (resolve) => {
                     const page = await browser.newPage();
+                    page.setDefaultNavigationTimeout(config.get<number>('timeout'));
+                    page.setDefaultTimeout(config.get<number>('timeout'));
                     await page.goto(pageUrl);
 
                     const productNameElement = await page.$('.page-title');

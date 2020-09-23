@@ -1,5 +1,6 @@
 {
   "batch_size": 5,
   "cron_expression": "*/5 * * * *",
-  "logging_level": "debug"
+  "logging_level": "debug",
+  "timeout": 60000
 }

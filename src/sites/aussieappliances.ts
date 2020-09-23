@@ -1,3 +1,4 @@
+import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
@@ -10,6 +11,8 @@ class AussieAppliances implements Scannable {
 
     async scan(browser: Browser) {
         const page = await browser.newPage();
+        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
+        page.setDefaultTimeout(config.get<number>('timeout'));
         await page.goto(this.url);
 
         const cards: Card[] = [];
@@ -37,6 +40,8 @@ class AussieAppliances implements Scannable {
 
                     try {
                         const productPage = await browser.newPage();
+                        productPage.setDefaultNavigationTimeout(config.get<number>('timeout'));
+                        productPage.setDefaultTimeout(config.get<number>('timeout'));
                         await productPage.goto(url, { timeout: 60000 });
                         await productPage.waitForSelector('.stock', { timeout: 60000 });
 

@@ -1,3 +1,4 @@
+import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
@@ -9,6 +10,8 @@ class IJK implements Scannable {
 
     async scan(browser: Browser) {
         const page = await browser.newPage();
+        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
+        page.setDefaultTimeout(config.get<number>('timeout'));
         await page.goto(this.url);
 
         const cards: Card[] = [];
