@@ -2,6 +2,7 @@ import config from 'config';
 import puppeteer from 'puppeteer';
 // @ts-ignore
 import PushBullet from 'pushbullet';
+import notifier from 'node-notifier';
 import schedule from 'node-schedule';
 import { performance } from 'perf_hooks';
 
@@ -92,6 +93,11 @@ class Application {
                                         `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
                                     );
 
+                                    notifier.notify({
+                                        title: '3080 Finder - New Card',
+                                        message: `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
+                                    });
+
                                     logger.info(
                                         `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
                                     );
@@ -102,6 +108,11 @@ class Application {
                                             '3080 Finder',
                                             `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
                                         );
+
+                                        notifier.notify({
+                                            title: '3080 Finder - Price Changed',
+                                            message: `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
+                                        });
 
                                         logger.info(
                                             `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
@@ -115,6 +126,11 @@ class Application {
                                             `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
                                         );
 
+                                        notifier.notify({
+                                            title: '3080 Finder - Availability Changed',
+                                            message: `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
+                                        });
+
                                         logger.info(
                                             `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
                                         );
@@ -127,6 +143,11 @@ class Application {
                                             `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
                                         );
 
+                                        notifier.notify({
+                                            title: '3080 Finder - Stock Changed',
+                                            message: `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
+                                        });
+
                                         logger.info(
                                             `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
                                         );
@@ -138,6 +159,11 @@ class Application {
                                             '3080 Finder',
                                             `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
                                         );
+
+                                        notifier.notify({
+                                            title: '3080 Finder - Stock Changed',
+                                            message: `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
+                                        });
 
                                         logger.info(
                                             `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
