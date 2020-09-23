@@ -52,7 +52,13 @@ class Application {
         new FantasticHobbies(),
     ];
 
-    pusher = new PushBullet(config.get<string>('pushbullet_key'));
+    pusher: any;
+
+    constructor() {
+        if (config.has('pushbullet_key') && config.has('pushbullet_device_id')) {
+            this.pusher = new PushBullet(config.get<string>('pushbullet_key'));
+        }
+    }
 
     async scanSites(headless: boolean) {
         logger.debug('Scheduler::scanSites - running');
@@ -155,7 +161,9 @@ class Application {
     }
 
     private recordChange(title: string, message: string) {
-        this.pusher.note(config.get<string>('pushbullet_device_id'), '3080 Finder', message);
+        if (this.pusher) {
+            this.pusher.note(config.get<string>('pushbullet_device_id'), '3080 Finder', message);
+        }
 
         notifier.notify({
             title,

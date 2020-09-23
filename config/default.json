@@ -1,3 +1,4 @@
 {
-  "cron_expression": "*/5 * * * *"
+  "cron_expression": "*/5 * * * *",
+  "logging_level": "debug"
 }
