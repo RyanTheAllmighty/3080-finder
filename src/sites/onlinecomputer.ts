@@ -1,8 +1,8 @@
-import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import { getNewPage } from '../utils/browser';
 
 class OnlineComputer implements Scannable {
     urls = [
@@ -17,9 +17,7 @@ class OnlineComputer implements Scannable {
         await Promise.allSettled(
             this.urls.map((pageUrl) => {
                 return new Promise(async (resolve) => {
-                    const page = await browser.newPage();
-                    page.setDefaultNavigationTimeout(config.get<number>('timeout'));
-                    page.setDefaultTimeout(config.get<number>('timeout'));
+                    const page = await getNewPage(browser);
                     await page.goto(pageUrl);
 
                     const productNameElement = await page.$('.wrapper-product-title > h1');

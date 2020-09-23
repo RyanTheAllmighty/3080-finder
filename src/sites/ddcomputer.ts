@@ -1,8 +1,8 @@
-import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import { getNewPage } from '../utils/browser';
 import logger from '../utils/logger';
 
 class DDComputer implements Scannable {
@@ -10,9 +10,7 @@ class DDComputer implements Scannable {
         'https://ddcomputer.com.au/index.php?body=searchEngine&type=result&searchText=3080&searchType=normal&title1=Search+Result%203080&searchCat=VIDEO&title1=search%20result%20list%20in%20category%20of%20%20VIDEO&searchThumbnailViewing=off&title1=Search%20result%20list&title2=with%20off%20thumbnail';
 
     async scan(browser: Browser) {
-        const page = await browser.newPage();
-        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
-        page.setDefaultTimeout(config.get<number>('timeout'));
+        const page = await getNewPage(browser);
         await page.goto(this.url);
 
         const cards: Card[] = [];
@@ -37,9 +35,7 @@ class DDComputer implements Scannable {
                     const productPrice = currency(productPriceString).value;
 
                     try {
-                        const productPage = await browser.newPage();
-                        productPage.setDefaultNavigationTimeout(config.get<number>('timeout'));
-                        productPage.setDefaultTimeout(config.get<number>('timeout'));
+                        const productPage = await getNewPage(browser);
                         await productPage.goto(url);
                         await productPage.waitForSelector('.columnContainer');
 

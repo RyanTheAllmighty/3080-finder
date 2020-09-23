@@ -1,17 +1,15 @@
-import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import { getNewPage } from '../utils/browser';
 
 class IJK implements Scannable {
     url =
         'https://www.ijk.com.au/branch/ijk/advanced_search_result.php?search_in_description=0&inc_subcat=1&keywords=rtx+3080&x=0&y=0&manufacturers_id=';
 
     async scan(browser: Browser) {
-        const page = await browser.newPage();
-        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
-        page.setDefaultTimeout(config.get<number>('timeout'));
+        const page = await getNewPage(browser);
         await page.goto(this.url);
 
         const cards: Card[] = [];

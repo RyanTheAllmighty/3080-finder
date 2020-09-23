@@ -1,16 +1,14 @@
-import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import { getNewPage } from '../utils/browser';
 
 class SaveOnIt implements Scannable {
     url = 'https://www.saveonit.com.au/searches?searchbox=rtx3080';
 
     async scan(browser: Browser) {
-        const page = await browser.newPage();
-        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
-        page.setDefaultTimeout(config.get<number>('timeout'));
+        const page = await getNewPage(browser);
         await page.goto(this.url);
 
         const cards: Card[] = [];

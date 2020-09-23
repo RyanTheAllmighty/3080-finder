@@ -80,7 +80,7 @@ class Application {
             headless,
             defaultViewport: null,
             args: ['--window-size=1920,1080', '--window-position=1921,0', '--no-sandbox', '--disable-setuid-sandbox'],
-            timeout: 60000,
+            timeout: config.get<number>('timeout'),
         });
 
         await asyncBatch(

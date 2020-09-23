@@ -1,17 +1,15 @@
-import config from 'config';
 import currency from 'currency.js';
 import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
+import { getNewPage } from '../utils/browser';
 import logger from '../utils/logger';
 
 class EYO implements Scannable {
     url = 'https://www.eyo.com.au/search_results.php?search_term=3080&search_catid=4';
 
     async scan(browser: Browser) {
-        const page = await browser.newPage();
-        page.setDefaultNavigationTimeout(config.get<number>('timeout'));
-        page.setDefaultTimeout(config.get<number>('timeout'));
+        const page = await getNewPage(browser);
         await page.goto(this.url);
 
         const cards: Card[] = [];
@@ -43,9 +41,7 @@ class EYO implements Scannable {
                     const productPrice = currency(productPriceString).value;
 
                     try {
-                        const productPage = await browser.newPage();
-                        productPage.setDefaultNavigationTimeout(config.get<number>('timeout'));
-                        productPage.setDefaultTimeout(config.get<number>('timeout'));
+                        const productPage = await getNewPage(browser);
                         await productPage.goto(url);
                         await productPage.waitForSelector('#product-stock');
 
