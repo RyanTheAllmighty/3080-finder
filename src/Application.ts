@@ -28,6 +28,7 @@ import ComputerAlliance from './sites/computeralliance';
 import OnlineComputer from './sites/onlinecomputer';
 import SaveOnIt from './sites/saveonit';
 import IJK from './sites/ijk';
+import FantasticHobbies from './sites/fantastichobbies';
 
 class Application {
     scanners: Scannable[] = [
@@ -48,6 +49,7 @@ class Application {
         new OnlineComputer(),
         new SaveOnIt(),
         new IJK(),
+        new FantasticHobbies(),
     ];
 
     pusher = new PushBullet(config.get<string>('pushbullet_key'));
