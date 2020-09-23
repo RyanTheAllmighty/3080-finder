@@ -205,12 +205,14 @@ class Application {
     /**
      * Starts the application.
      */
-    async start() {
+    async start(immediate: boolean = false, headless: boolean = true) {
         logger.debug('Starting application');
 
         schedule.scheduleJob('*/5 * * * *', () => this.scanSites(true));
 
-        // await this.scanSites(false);
+        if (immediate) {
+            await this.scanSites(headless);
+        }
     }
 }
 
