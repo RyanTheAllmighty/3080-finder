@@ -159,7 +159,7 @@ class Application {
 
                     resolve();
                 }),
-            5,
+            config.get<number>('batch_size'),
         );
 
         const end = performance.now();
