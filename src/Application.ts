@@ -6,7 +6,7 @@ import notifier from 'node-notifier';
 import schedule from 'node-schedule';
 import { performance } from 'perf_hooks';
 
-import { Card, CardDBRecord, Scannable, ScanResult } from './core';
+import { CardDBRecord, Scannable } from './core';
 
 import logger from './utils/logger';
 import { databases } from './utils/db';
@@ -89,85 +89,35 @@ class Application {
                                 });
 
                                 if (!cardRecord) {
-                                    this.pusher.note(
-                                        config.get<string>('pushbullet_device_id'),
-                                        '3080 Finder',
-                                        `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
-                                    );
-
-                                    notifier.notify({
-                                        title: '3080 Finder - New Card',
-                                        message: `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
-                                    });
-
-                                    logger.info(
+                                    this.recordChange(
+                                        '3080 Finder - New Card',
                                         `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
                                     );
                                 } else {
                                     if (cardRecord.price !== card.price) {
-                                        this.pusher.note(
-                                            config.get<string>('pushbullet_device_id'),
-                                            '3080 Finder',
-                                            `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
-                                        );
-
-                                        notifier.notify({
-                                            title: '3080 Finder - Price Changed',
-                                            message: `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
-                                        });
-
-                                        logger.info(
+                                        this.recordChange(
+                                            '3080 Finder - Price Changed',
                                             `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
                                         );
                                     }
 
                                     if (cardRecord.availability !== card.availability) {
-                                        this.pusher.note(
-                                            config.get<string>('pushbullet_device_id'),
-                                            '3080 Finder',
-                                            `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
-                                        );
-
-                                        notifier.notify({
-                                            title: '3080 Finder - Availability Changed',
-                                            message: `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
-                                        });
-
-                                        logger.info(
+                                        this.recordChange(
+                                            '3080 Finder - Availability Changed',
                                             `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
                                         );
                                     }
 
                                     if (cardRecord.stockStore !== card.stockStore) {
-                                        this.pusher.note(
-                                            config.get<string>('pushbullet_device_id'),
-                                            '3080 Finder',
-                                            `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
-                                        );
-
-                                        notifier.notify({
-                                            title: '3080 Finder - Stock Changed',
-                                            message: `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
-                                        });
-
-                                        logger.info(
+                                        this.recordChange(
+                                            '3080 Finder - Stock Changed',
                                             `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
                                         );
                                     }
 
                                     if (cardRecord.stockSupplier !== card.stockSupplier) {
-                                        this.pusher.note(
-                                            config.get<string>('pushbullet_device_id'),
-                                            '3080 Finder',
-                                            `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
-                                        );
-
-                                        notifier.notify({
-                                            title: '3080 Finder - Stock Changed',
-                                            message: `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
-                                        });
-
-                                        logger.info(
+                                        this.recordChange(
+                                            '3080 Finder - Stock Changed',
                                             `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
                                         );
                                     }
@@ -204,13 +154,24 @@ class Application {
         databases.cards.persistence.compactDatafile();
     }
 
+    private recordChange(title: string, message: string) {
+        this.pusher.note(config.get<string>('pushbullet_device_id'), '3080 Finder', message);
+
+        notifier.notify({
+            title,
+            message,
+        });
+
+        logger.info(message);
+    }
+
     /**
      * Starts the application.
      */
     async start(immediate: boolean = false, headless: boolean = true) {
         logger.debug('Starting application');
 
-        schedule.scheduleJob('*/5 * * * *', () => this.scanSites(true));
+        schedule.scheduleJob(config.get<string>('cron_expression'), () => this.scanSites(true));
 
         if (immediate) {
             await this.scanSites(headless);
