@@ -85,7 +85,7 @@ class Application {
                             logger.debug(
                                 `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${
                                     end - start
-                                }ms`,
+                                }ms. Found ${result.cards.length} cards`,
                             );
 
                             for await (const card of result.cards) {
