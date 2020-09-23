@@ -1,6 +1,7 @@
 import config from 'config';
 // @ts-ignore
 import PushBullet from 'pushbullet';
+import asyncBatch from 'async-batch';
 import notifier from 'node-notifier';
 import schedule from 'node-schedule';
 import puppeteer from 'puppeteer-extra';
@@ -82,83 +83,83 @@ class Application {
             timeout: 60000,
         });
 
-        await Promise.allSettled(
-            this.scanners.map(
-                (scanner) =>
-                    new Promise(async (resolve, reject) => {
-                        try {
-                            logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
-                            const start = performance.now();
+        await asyncBatch(
+            this.scanners,
+            (scanner) =>
+                new Promise(async (resolve, reject) => {
+                    try {
+                        logger.debug(`Scheduler::scanSites - running ${scanner.constructor.name}`);
+                        const start = performance.now();
 
-                            const result = await scanner.scan(browser);
+                        const result = await scanner.scan(browser);
 
-                            const end = performance.now();
-                            logger.debug(
-                                `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${
-                                    end - start
-                                }ms. Found ${result.cards.length} cards`,
-                            );
+                        const end = performance.now();
+                        logger.debug(
+                            `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${
+                                end - start
+                            }ms. Found ${result.cards.length} cards`,
+                        );
 
-                            for await (const card of result.cards) {
-                                const cardRecord = await databases.cards.findOne<CardDBRecord>({
-                                    productNumber: card.productNumber,
-                                    scanner: scanner.constructor.name,
-                                });
+                        for await (const card of result.cards) {
+                            const cardRecord = await databases.cards.findOne<CardDBRecord>({
+                                productNumber: card.productNumber,
+                                scanner: scanner.constructor.name,
+                            });
 
-                                if (!cardRecord) {
+                            if (!cardRecord) {
+                                this.recordChange(
+                                    '3080 Finder - New Card',
+                                    `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
+                                );
+                            } else {
+                                if (cardRecord.price !== card.price) {
                                     this.recordChange(
-                                        '3080 Finder - New Card',
-                                        `New card on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) for ${card.price} with availablity of "${card.availability}" [${card.url}]`,
+                                        '3080 Finder - Price Changed',
+                                        `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
                                     );
-                                } else {
-                                    if (cardRecord.price !== card.price) {
-                                        this.recordChange(
-                                            '3080 Finder - Price Changed',
-                                            `Card price changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from ${cardRecord.price} to ${card.price} [${card.url}]`,
-                                        );
-                                    }
-
-                                    if (cardRecord.availability !== card.availability) {
-                                        this.recordChange(
-                                            '3080 Finder - Availability Changed',
-                                            `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
-                                        );
-                                    }
-
-                                    if (cardRecord.stockStore !== card.stockStore) {
-                                        this.recordChange(
-                                            '3080 Finder - Stock Changed',
-                                            `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
-                                        );
-                                    }
-
-                                    if (cardRecord.stockSupplier !== card.stockSupplier) {
-                                        this.recordChange(
-                                            '3080 Finder - Stock Changed',
-                                            `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
-                                        );
-                                    }
                                 }
 
-                                await databases.cards.update<CardDBRecord>(
-                                    {
-                                        productNumber: card.productNumber,
-                                        scanner: scanner.constructor.name,
-                                    },
-                                    { ...card, scanner: scanner.constructor.name },
-                                    { upsert: true },
-                                );
-                            }
-                        } catch (e) {
-                            logger.error(
-                                `Error when scanning ${scanner.constructor.name} - ${e?.message || 'Unknown error'}`,
-                            );
-                            reject(e);
-                        }
+                                if (cardRecord.availability !== card.availability) {
+                                    this.recordChange(
+                                        '3080 Finder - Availability Changed',
+                                        `Card availability changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.availability}" to "${card.availability}" [${card.url}]`,
+                                    );
+                                }
 
-                        resolve();
-                    }),
-            ),
+                                if (cardRecord.stockStore !== card.stockStore) {
+                                    this.recordChange(
+                                        '3080 Finder - Stock Changed',
+                                        `Card store stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockStore}" to "${card.stockStore}" [${card.url}]`,
+                                    );
+                                }
+
+                                if (cardRecord.stockSupplier !== card.stockSupplier) {
+                                    this.recordChange(
+                                        '3080 Finder - Stock Changed',
+                                        `Card supplier stock changed on ${scanner.constructor.name}: ${card.name} (${card.productNumber}) from "${cardRecord.stockSupplier}" to "${card.stockSupplier}" [${card.url}]`,
+                                    );
+                                }
+                            }
+
+                            await databases.cards.update<CardDBRecord>(
+                                {
+                                    productNumber: card.productNumber,
+                                    scanner: scanner.constructor.name,
+                                },
+                                { ...card, scanner: scanner.constructor.name },
+                                { upsert: true },
+                            );
+                        }
+                    } catch (e) {
+                        logger.error(
+                            `Error when scanning ${scanner.constructor.name} - ${e?.message || 'Unknown error'}`,
+                        );
+                        reject(e);
+                    }
+
+                    resolve();
+                }),
+            5,
         );
 
         const end = performance.now();
