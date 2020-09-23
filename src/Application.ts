@@ -31,6 +31,7 @@ import SaveOnIt from './sites/saveonit';
 import IJK from './sites/ijk';
 import FantasticHobbies from './sites/fantastichobbies';
 import EYO from './sites/eyo';
+import AllNeeds from './sites/allneeds';
 
 class Application {
     scanners: Scannable[] = [
@@ -53,6 +54,7 @@ class Application {
         new IJK(),
         new FantasticHobbies(),
         new EYO(),
+        new AllNeeds(),
     ];
 
     pusher: any;
