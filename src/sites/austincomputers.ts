@@ -3,9 +3,10 @@ import type { Browser } from 'puppeteer';
 
 import type { Card, Scannable } from '../core';
 import { getNewPage } from '../utils/browser';
+import logger from '../utils/logger';
 
 class AustinComputers implements Scannable {
-    url = 'https://www.austin.net.au/search/?q=3080';
+    url = 'https://www.austin.net.au/search/?q=rtx+3080';
 
     async scan(browser: Browser) {
         const page = await getNewPage(browser);
@@ -16,35 +17,54 @@ class AustinComputers implements Scannable {
         await page.waitForSelector('#kuLandingProductsListUl');
         const items = await page.$$('#kuLandingProductsListUl li');
 
-        for await (const item of items) {
-            const productNameElement = await item.$('.kuName > a');
-            const productName = await page.evaluate((el) => el.textContent.trim(), productNameElement);
-            const url: string = await page.evaluate((el) => el.href, productNameElement);
+        await Promise.allSettled(
+            items.map((item) => {
+                return new Promise(async (resolve) => {
+                    const productNameElement = await item.$('.kuName > a');
+                    const productName = await page.evaluate((el) => el.textContent.trim(), productNameElement);
+                    const url: string = await page.evaluate((el) => el.href, productNameElement);
 
-            if (!productName.includes('3080')) {
-                continue;
-            }
+                    if (!productName.includes('3080')) {
+                        resolve();
+                    }
 
-            const productModelNumber = url.substr(url.lastIndexOf('/') + 1);
+                    const productModelNumber = url.substr(url.lastIndexOf('/') + 1);
 
-            const productPriceElement = await item.$('.kuSalePrice');
-            const productPriceString = await page.evaluate((el) => el.textContent.trim(), productPriceElement);
-            const productPrice = currency(productPriceString).value;
+                    const productPriceElement = await item.$('.kuSalePrice');
+                    const productPriceString = await page.evaluate((el) => el.textContent.trim(), productPriceElement);
+                    const productPrice = currency(productPriceString).value;
 
-            let availability = 'In Stock';
-            const availabilityElement = await item.$('.klevu-out-of-stock');
-            if (availabilityElement) {
-                availability = await page.evaluate((el) => el.textContent.trim(), availabilityElement);
-            }
+                    try {
+                        const productPage = await getNewPage(browser);
+                        await productPage.goto(url);
+                        await productPage.waitForSelector('.inventory-section');
 
-            cards.push({
-                name: productName,
-                productNumber: productModelNumber,
-                price: productPrice,
-                availability,
-                url,
-            });
-        }
+                        const availabilityElement = await productPage.$('.inventory-section div:nth-child(3)');
+                        const availability = await productPage.evaluate(
+                            (el) => el.textContent.trim(),
+                            availabilityElement,
+                        );
+
+                        cards.push({
+                            name: productName,
+                            productNumber: productModelNumber,
+                            price: productPrice,
+                            availability,
+                            url,
+                        });
+                    } catch (e) {
+                        logger.error(
+                            `Error when scanning ${productName} from ${this.constructor.name} - ${
+                                e?.message || 'Unknown error'
+                            }`,
+                        );
+                        resolve();
+                    }
+
+                    resolve();
+                });
+            }),
+        );
 
         await page.close();
 
