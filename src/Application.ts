@@ -81,7 +81,7 @@ class Application {
         const browser = await puppeteer.launch({
             headless,
             defaultViewport: null,
-            args: ['--window-size=1920,1080', '--window-position=1921,0', '--no-sandbox', '--disable-setuid-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
             timeout: config.get<number>('timeout'),
         });
 
@@ -156,7 +156,7 @@ class Application {
                         logger.error(
                             `Error when scanning ${scanner.constructor.name} - ${e?.message || 'Unknown error'}`,
                         );
-                        reject(e);
+                        resolve();
                     }
 
                     resolve();
