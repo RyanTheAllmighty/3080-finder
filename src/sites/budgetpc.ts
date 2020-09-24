@@ -21,7 +21,7 @@ class BudgetPC implements Scannable {
             const productName = await page.evaluate((el) => el.textContent.trim(), productNameElement);
             const url: string = await page.evaluate((el) => el.href, productNameElement);
 
-            const productModelNumber = url.substr(url.lastIndexOf('/') + 1);
+            const productModelNumber = url.substr(url.lastIndexOf('/') + 1) || productName;
 
             const productPriceElement = await item.$('.price');
             const productPriceString = await page.evaluate((el) => el.textContent.trim(), productPriceElement);
