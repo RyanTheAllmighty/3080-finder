@@ -36,6 +36,7 @@ import AllNeeds from './sites/allneeds';
 import DDComputer from './sites/ddcomputer';
 import TechHut from './sites/techhut';
 import MegaBuy from './sites/megabuy';
+import Centrecom from './sites/centrecom';
 
 class Application {
     scanners: Scannable[] = [
@@ -62,6 +63,7 @@ class Application {
         new DDComputer(),
         new TechHut(),
         new MegaBuy(),
+        new Centrecom(),
     ];
 
     pusher: any;
