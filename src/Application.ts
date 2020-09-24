@@ -192,12 +192,14 @@ class Application {
     /**
      * Starts the application.
      */
-    async start(immediate: boolean = false, headless: boolean = true) {
+    async start(immediate: boolean = false, headless: boolean = true, runOnce: boolean = false) {
         logger.debug('Starting application');
 
-        schedule.scheduleJob(config.get<string>('cron_expression'), () => this.scanSites(true));
+        if (!runOnce) {
+            schedule.scheduleJob(config.get<string>('cron_expression'), () => this.scanSites(true));
+        }
 
-        if (immediate) {
+        if (runOnce || immediate) {
             await this.scanSites(headless);
         }
     }

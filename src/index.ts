@@ -4,4 +4,5 @@ import Application from './Application';
 new Application().start(
     process.argv.slice(2).includes('--immediate'),
     !process.argv.slice(2).includes('--not-headless'),
+    process.argv.slice(2).includes('--run-once'),
 );
