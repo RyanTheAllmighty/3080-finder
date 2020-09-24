@@ -173,14 +173,16 @@ class Application {
     }
 
     private recordChange(title: string, message: string) {
-        if (this.pusher) {
-            this.pusher.note(config.get<string>('pushbullet_device_id'), '3080 Finder', message);
-        }
+        if (config.get<boolean>('send_notifications')) {
+            if (this.pusher) {
+                this.pusher.note(config.get<string>('pushbullet_device_id'), '3080 Finder', message);
+            }
 
-        notifier.notify({
-            title,
-            message,
-        });
+            notifier.notify({
+                title,
+                message,
+            });
+        }
 
         logger.info(message);
     }
