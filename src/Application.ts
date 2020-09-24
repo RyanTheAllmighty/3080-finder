@@ -35,6 +35,7 @@ import EYO from './sites/eyo';
 import AllNeeds from './sites/allneeds';
 import DDComputer from './sites/ddcomputer';
 import TechHut from './sites/techhut';
+import MegaBuy from './sites/megabuy';
 
 class Application {
     scanners: Scannable[] = [
@@ -60,6 +61,7 @@ class Application {
         new AllNeeds(),
         new DDComputer(),
         new TechHut(),
+        new MegaBuy(),
     ];
 
     pusher: any;
