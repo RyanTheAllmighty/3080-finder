@@ -2,6 +2,15 @@
 
 Finds Nvidia RTX 3080 graphics cards at various retailers in Australia.
 
+## NOTE
+
+I've secured my 3080, so will no longer be updating this script, but will keep it up for prosperity (and likely will
+use it as a base for other projects I need scraping/puppeteer for).
+
+If you do end up using this script, be aware that it seems to have some reliability issues when using on a headless
+Linux server. Chromium will just take up all the ram and completely take all resources and freeze the box. Likely
+something isn't closing somewhere.
+
 ## What is it?
 
 First thing to note is that this will **NOT** purchase cards for you. This is only intended to be used to check
