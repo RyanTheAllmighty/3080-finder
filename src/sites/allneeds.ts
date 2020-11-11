@@ -6,7 +6,12 @@ import type { Card, Scannable } from '../core';
 import { getNewPage } from '../utils/browser';
 
 class AllNeeds implements Scannable {
-    urls = ['https://allneeds.com.au/asus-geforce-rtx-3080-tuf-gaming-10gb'];
+    urls = [
+        'https://allneeds.com.au/gigabyte-geforce-rtx-3080-gaming-oc-10gb',
+        'https://allneeds.com.au/galax-geforce-rtx-3080-sg-1-click-oc-10gb-38nwm3md99nn',
+        'https://allneeds.com.au/asus-geforce-rtx-3080-tuf-gaming-10gb',
+        'https://allneeds.com.au/asus-geforce-rtx-3080-tuf-gaming-oc-10gb-tuf-rtx3080-o10g-gaming',
+    ];
 
     async scan(browser: Browser) {
         const cards: Card[] = [];
