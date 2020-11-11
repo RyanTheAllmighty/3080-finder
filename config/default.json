@@ -3,5 +3,10 @@
   "cron_expression": "*/5 * * * *",
   "logging_level": "debug",
   "send_notifications": true,
-  "timeout": 60000
+  "timeout": 60000,
+  "maxPrice": 2000,
+  "excludedNames": [
+    "3070",
+    "3090"
+  ]
 }

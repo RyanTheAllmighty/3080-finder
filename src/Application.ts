@@ -97,14 +97,22 @@ class Application {
 
                         const result = await scanner.scan(browser);
 
+                        const cards = result.cards.filter(
+                            ({ name, price }) =>
+                                !config
+                                    .get<string[]>('excludedNames')
+                                    .some((excludedName) => name.includes(excludedName)) &&
+                                price <= config.get<number>('maxPrice'),
+                        );
+
                         const end = performance.now();
                         logger.debug(
                             `Scheduler::scanSites - finished running ${scanner.constructor.name} in ${
                                 end - start
-                            }ms. Found ${result.cards.length} cards`,
+                            }ms. Found ${cards.length} cards`,
                         );
 
-                        for await (const card of result.cards) {
+                        for await (const card of cards) {
                             const cardRecord = await databases.cards.findOne<CardDBRecord>({
                                 productNumber: card.productNumber,
                                 scanner: scanner.constructor.name,
