@@ -29,16 +29,22 @@ class PBTech implements Scannable {
             const productPrice = currency(productPriceString).value;
 
             const shippingDateElement = await item.$('.pPickUp');
-            const shippingDate = await page.evaluate((el) => el.textContent.trim(), shippingDateElement);
+            let shippingDate = 'Out Of Stock';
+            if (shippingDateElement) {
+                shippingDate = await page.evaluate((el) => el.textContent.trim(), shippingDateElement);
+            }
 
             const stockStoreElement = await item.$('.stock_pb .stock_display');
-            const stockStore = parseInt(await page.evaluate((el) => el.textContent.trim(), stockStoreElement), 10);
+            let stockStore;
+            if (stockStoreElement) {
+                stockStore = parseInt(await page.evaluate((el) => el.textContent.trim(), stockStoreElement), 10);
+            }
 
             const stockSupplierElement = await item.$('.stock_other .stock_display');
-            const stockSupplier = parseInt(
-                await page.evaluate((el) => el.textContent.trim(), stockSupplierElement),
-                10,
-            );
+            let stockSupplier;
+            if (stockSupplierElement) {
+                stockSupplier = parseInt(await page.evaluate((el) => el.textContent.trim(), stockSupplierElement), 10);
+            }
 
             cards.push({
                 name: productName,
