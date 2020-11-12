@@ -36,6 +36,7 @@ class Scorptec implements Scannable {
                     el.textContent
                         .trim()
                         .replaceAll('\n', '')
+                        .replace('Order OnlyOrder Only', 'Order Only Order Only')
                         .replace('Order OnlySOLD OUT', 'Order Only SOLD OUT')
                         .replace('SOLD OUTSOLD OUT', 'SOLD OUT SOLD OUT'),
                 availabilityElement,
